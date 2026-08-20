@@ -1,0 +1,62 @@
+"""Streamlit entry point for JobPilot AI."""
+
+import streamlit as st
+from jobpilot.config import configure_logging, get_settings
+from jobpilot.ui.design import apply_design
+
+
+def main() -> None:
+    """Configure the app shell and run the selected page."""
+    configure_logging(get_settings())
+    st.set_page_config(
+        page_title="JobPilot AI",
+        page_icon=":material/work:",
+        layout="wide",
+        initial_sidebar_state="collapsed",
+        menu_items={
+            "About": "AI-powered job discovery, matching and application intelligence.",
+        },
+    )
+    apply_design()
+
+    jobs_page = st.Page(
+        "pages/jobs.py",
+        title="Jobs",
+        icon=":material/work:",
+        url_path="jobs",
+    )
+    searches_page = st.Page(
+        "pages/searches.py",
+        title="Searches",
+        icon=":material/search:",
+        url_path="searches",
+    )
+    insights_page = st.Page(
+        "pages/insights.py",
+        title="Insights",
+        icon=":material/insights:",
+        url_path="insights",
+    )
+    pages = (jobs_page, searches_page, insights_page)
+    home_page = st.Page(
+        lambda: st.switch_page(jobs_page),
+        title="Jobs",
+        default=True,
+        visibility="hidden",
+    )
+    page = st.navigation([home_page, *pages], position="hidden")
+
+    with st.container(
+        key="primary-navigation",
+        horizontal=True,
+        vertical_alignment="center",
+        gap="xsmall",
+    ):
+        for destination in pages:
+            st.page_link(destination)
+
+    page.run()
+
+
+if __name__ == "__main__":
+    main()
